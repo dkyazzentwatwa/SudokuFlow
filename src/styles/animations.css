@@ -1,0 +1,238 @@
+/* Number Placement Animations */
+@keyframes placeSuccess {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes placeError {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+.place-success {
+  animation: placeSuccess 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.place-error {
+  animation: placeError 0.3s;
+}
+
+/* Cell Animations */
+@keyframes cellPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+.cell-highlight {
+  animation: cellPulse 0.5s ease-in-out;
+}
+
+/* Ripple Effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--primary);
+  transform: scale(0);
+  animation: rippleEffect 0.6s ease-out;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+@keyframes rippleEffect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Confetti Animation */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--color, var(--primary));
+  animation: 
+    confettiFall var(--duration, 3s) var(--delay, 0s) ease-in-out,
+    confettiSpin var(--duration, 3s) var(--delay, 0s) linear;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-100vh) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--x, 0)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes confettiSpin {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+/* Victory Modal Animation */
+@keyframes victorySlideIn {
+  0% {
+    transform: translateY(-20px) scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.victory-modal {
+  animation: victorySlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cascade Animation for Victory */
+@keyframes cascade {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.cascade-cell {
+  animation: cascade 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+/* Number Hover Effect */
+.number-hover {
+  transition: all 0.2s ease;
+}
+
+.number-hover:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
+}
+
+/* Auto Notes Animation */
+@keyframes noteFadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.note-appear {
+  animation: noteFadeIn 0.2s ease-out;
+}
+
+/* Focus Mode Transition */
+.focus-mode-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.focus-mode-hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+/* Achievement Toast Animation */
+@keyframes toastSlideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.achievement-toast {
+  animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pulse for Important Elements */
+@keyframes softPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(184, 169, 229, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(184, 169, 229, 0);
+  }
+}
+
+.pulse-attention {
+  animation: softPulse 2s infinite;
+}
+
+/* Smooth Number Change */
+.number-transition {
+  transition: all 0.15s ease-out;
+}
+
+.number-transition.changing {
+  transform: scale(0.8);
+  opacity: 0.5;
+}
+
+/* Highlight Animation */
+@keyframes highlightGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(184, 169, 229, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(184, 169, 229, 0.6);
+  }
+}
+
+.highlight-glow {
+  animation: highlightGlow 1s ease-in-out infinite;
+}
