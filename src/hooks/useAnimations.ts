@@ -8,7 +8,7 @@ export interface AnimationConfig {
 }
 
 export function useNumberPlacement() {
-  const animationsRef = useRef<Map<number, NodeJS.Timeout>>(new Map());
+  const animationsRef = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
   
   const animateCell = (
     cellIndex: number, 

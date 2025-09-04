@@ -1,4 +1,3 @@
-import React from 'react';
 import { statisticsManager } from '../utils/statistics';
 import './StatsModal.css';
 

@@ -1,7 +1,6 @@
 import { Board, GeneratorOptions } from './types';
 import { createEmptyBoard, cloneBoard, initializeCandidates, parseBoard } from './board';
 import { solveFull, validateUniqueness } from './fullSolver';
-import { meetsTargetDifficulty } from './difficulty';
 import { SeededRandom } from '../utils/rng';
 import { PRESET_PUZZLES } from './puzzles';
 

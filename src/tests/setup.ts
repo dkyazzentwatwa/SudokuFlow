@@ -16,4 +16,4 @@ class WorkerMock {
   terminate() {}
 }
 
-global.Worker = WorkerMock as any;
+(globalThis as any).Worker = WorkerMock;

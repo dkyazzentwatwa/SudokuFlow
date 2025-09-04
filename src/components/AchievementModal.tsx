@@ -1,4 +1,3 @@
-import React from 'react';
 import { achievementManager } from '../utils/achievements';
 import './AchievementModal.css';
 

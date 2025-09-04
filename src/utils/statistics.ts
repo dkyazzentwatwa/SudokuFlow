@@ -118,7 +118,7 @@ class StatisticsManager {
     return date.toDateString() === yesterday.toDateString();
   }
   
-  private getGamesForDifficulty(difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert'): number {
+  private getGamesForDifficulty(_difficulty: 'Easy' | 'Medium' | 'Hard' | 'Expert'): number {
     // This is a simplification - in a real app, we'd track games per difficulty
     return Math.max(1, Math.floor(this.stats.gamesCompleted / 4));
   }
