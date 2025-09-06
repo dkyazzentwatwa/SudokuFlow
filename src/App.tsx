@@ -56,6 +56,7 @@ function App() {
   const [autoNotesUsed, setAutoNotesUsed] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showMobileNumberPad, setShowMobileNumberPad] = useState(false);
   
   // Detect mobile device
   useEffect(() => {
@@ -69,6 +70,15 @@ function App() {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+  
+  // Show number pad when cell is selected on mobile
+  useEffect(() => {
+    if (isMobile && selectedCell !== null) {
+      setShowMobileNumberPad(true);
+    } else if (!isMobile) {
+      setShowMobileNumberPad(false);
+    }
+  }, [isMobile, selectedCell]);
   
   // Load initial puzzle and theme on mount
   useEffect(() => {
@@ -528,7 +538,21 @@ function App() {
         onClose={() => setNewAchievement(null)}
       />
       
-      <MobileNumberPad isVisible={isMobile && selectedCell !== null} />
+      <MobileNumberPad 
+        isVisible={showMobileNumberPad} 
+        onClose={() => setShowMobileNumberPad(false)} 
+      />
+      
+      {/* Floating button to reopen number pad */}
+      {isMobile && !showMobileNumberPad && selectedCell !== null && (
+        <button
+          className="mobile-number-pad-toggle"
+          onClick={() => setShowMobileNumberPad(true)}
+          aria-label="Open number pad"
+        >
+          🔢
+        </button>
+      )}
     </div>
   );
 }

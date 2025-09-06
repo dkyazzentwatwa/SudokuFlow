@@ -5,9 +5,10 @@ import './MobileNumberPad.css';
 
 interface MobileNumberPadProps {
   isVisible: boolean;
+  onClose: () => void;
 }
 
-export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible }) => {
+export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible, onClose }) => {
   const {
     selectedCell,
     pencilMode,
@@ -41,10 +42,28 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible }) =
     setPencilMode(!pencilMode);
   };
 
+  const handleClose = () => {
+    soundManager.play('click');
+    onClose();
+  };
+
   if (!isVisible) return null;
 
   return (
     <div className="mobile-number-pad">
+      <div className="mobile-number-pad-header">
+        <div className="mobile-mode-indicator">
+          {pencilMode ? '📝 Notes Mode' : '✍️ Answer Mode'}
+        </div>
+        <button
+          className="mobile-close-btn"
+          onClick={handleClose}
+          aria-label="Close number pad"
+        >
+          ✕
+        </button>
+      </div>
+      
       <div className="mobile-top-controls">
         <button
           className={`mobile-control-btn ${pencilMode ? 'active' : ''}`}
@@ -87,10 +106,6 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible }) =
             {digit}
           </button>
         ))}
-      </div>
-      
-      <div className="mobile-mode-indicator">
-        {pencilMode ? '📝 Notes Mode' : '✍️ Answer Mode'}
       </div>
     </div>
   );
