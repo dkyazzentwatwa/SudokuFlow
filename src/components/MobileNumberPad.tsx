@@ -74,6 +74,18 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible, onC
         </div>
         <div className="mobile-header-controls">
           <button
+            className="mobile-theme-toggle"
+            onClick={() => {
+              const themes = Object.keys(THEMES);
+              const currentIndex = themes.indexOf(currentTheme);
+              const nextTheme = themes[(currentIndex + 1) % themes.length];
+              handleThemeChange(nextTheme);
+            }}
+            aria-label="Switch theme"
+          >
+            {THEMES[currentTheme as keyof typeof THEMES]?.icon || '🎨'}
+          </button>
+          <button
             className="mobile-extras-btn"
             onClick={() => setShowExtras(!showExtras)}
             aria-label="Show more options"
@@ -97,6 +109,13 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible, onC
           aria-label="Toggle pencil mode"
         >
           ✏️
+        </button>
+        <button
+          className={`mobile-control-btn ${focusMode ? 'active' : ''}`}
+          onClick={handleFocusToggle}
+          aria-label="Focus mode"
+        >
+          🎯
         </button>
         <button
           className="mobile-control-btn"
@@ -137,7 +156,7 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible, onC
       {showExtras && (
         <div className="mobile-extras">
           <div className="mobile-extras-section">
-            <h4>Themes</h4>
+            <h4>All Themes</h4>
             <div className="mobile-theme-grid">
               {Object.entries(THEMES).map(([key, theme]) => (
                 <button
@@ -150,16 +169,6 @@ export const MobileNumberPad: React.FC<MobileNumberPadProps> = ({ isVisible, onC
                 </button>
               ))}
             </div>
-          </div>
-          
-          <div className="mobile-extras-section">
-            <h4>Focus</h4>
-            <button
-              className={`mobile-control-btn ${focusMode ? 'active' : ''}`}
-              onClick={handleFocusToggle}
-            >
-              <span>🎯 Focus Mode</span>
-            </button>
           </div>
         </div>
       )}
