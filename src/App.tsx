@@ -540,7 +540,9 @@ function App() {
       
       <MobileNumberPad 
         isVisible={showMobileNumberPad} 
-        onClose={() => setShowMobileNumberPad(false)} 
+        onClose={() => setShowMobileNumberPad(false)}
+        focusMode={focusMode}
+        setFocusMode={setFocusMode}
       />
       
       {/* Floating button to reopen number pad */}

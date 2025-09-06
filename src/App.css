@@ -524,7 +524,7 @@ body {
 @media (max-width: 768px) {
   .app {
     padding: 0.5rem;
-    padding-bottom: 200px; /* Space for mobile number pad */
+    padding-bottom: 150px; /* Space for mobile number pad */
   }
   
   .game-wrapper {
