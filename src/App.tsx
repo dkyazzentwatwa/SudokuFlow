@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { GridCanvas } from './components/GridCanvas';
+import { MobileNumberPad } from './components/MobileNumberPad';
 import { ThemePicker } from './components/ThemePicker';
 import { VictoryModal } from './components/VictoryModal';
 import { StatsModal } from './components/StatsModal';
@@ -23,6 +24,7 @@ const engineWorker = new Worker(
 function App() {
   const {
     board,
+    selectedCell,
     pencilMode,
     showConflicts,
     setPencilMode,
@@ -53,6 +55,20 @@ function App() {
   const [newAchievement, setNewAchievement] = useState<Achievement | null>(null);
   const [autoNotesUsed, setAutoNotesUsed] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth <= 768;
+      setIsMobile(isTouchDevice || isSmallScreen);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   // Load initial puzzle and theme on mount
   useEffect(() => {
@@ -242,7 +258,17 @@ function App() {
               <span className="timer-text">{formatTime(timer)}</span>
             </div>
             
-            <ThemePicker />
+            {!isMobile && <ThemePicker />}
+            
+            {isMobile && (
+              <button 
+                className="hint-button-mobile"
+                onClick={getHint}
+                title="Get Hint"
+              >
+                <span className="hint-icon">💡</span>
+              </button>
+            )}
             
             <button 
               className="stats-button"
@@ -252,13 +278,15 @@ function App() {
               <span className="stats-icon">📊</span>
             </button>
             
-            <button 
-              className="achievement-button"
-              onClick={() => setShowAchievements(true)}
-              title="View Achievements"
-            >
-              <span className="achievement-icon">🏆</span>
-            </button>
+            {!isMobile && (
+              <button 
+                className="achievement-button"
+                onClick={() => setShowAchievements(true)}
+                title="View Achievements"
+              >
+                <span className="achievement-icon">🏆</span>
+              </button>
+            )}
             
             <button 
               className="menu-button"
@@ -273,7 +301,7 @@ function App() {
           <div className="game-area">
             <GridCanvas />
             
-            <div className="quick-controls">
+            {!isMobile && <div className="quick-controls">
               <button 
                 className={`control-button ${pencilMode ? 'active' : ''}`}
                 onClick={() => {
@@ -354,7 +382,7 @@ function App() {
                 <span className="icon">🎯</span>
                 <span className="label">Focus</span>
               </button>
-            </div>
+            </div>}
             
             {currentStep && (
               <div className="hint-card">
@@ -499,6 +527,8 @@ function App() {
         achievement={newAchievement}
         onClose={() => setNewAchievement(null)}
       />
+      
+      <MobileNumberPad isVisible={isMobile && selectedCell !== null} />
     </div>
   );
 }

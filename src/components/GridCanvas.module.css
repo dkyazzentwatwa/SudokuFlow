@@ -1,3 +1,4 @@
+
 .canvas {
   cursor: pointer;
   border-radius: 20px;
@@ -6,6 +7,11 @@
     0 4px 24px rgba(184, 169, 229, 0.12),
     0 8px 48px rgba(184, 169, 229, 0.08);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-width: 100%;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .canvas:hover {
@@ -13,4 +19,14 @@
   box-shadow: 
     0 8px 32px rgba(184, 169, 229, 0.16),
     0 12px 56px rgba(184, 169, 229, 0.12);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .canvas:hover {
+    transform: none;
+  }
+  
+  .canvas:active {
+    transform: scale(0.98);
+  }
 }

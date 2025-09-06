@@ -1,10 +1,11 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { useBoardStore } from '../state/boardState';
 import { cellCoords } from '../engine/types';
 import styles from './GridCanvas.module.css';
 
 export const GridCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const {
     board,
     selectedCell,
@@ -18,9 +19,29 @@ export const GridCanvas: React.FC = () => {
     pencilMode
   } = useBoardStore();
   
-  const CELL_SIZE = 60;
-  const GRID_SIZE = CELL_SIZE * 9;
+  // Calculate cell size based on viewport
+  const calculateCellSize = () => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const maxGridWidth = Math.min(viewportWidth - 32, 544); // Max 544px with padding
+    const maxGridHeight = viewportHeight * 0.5; // Use max 50% of viewport height on mobile
+    const maxSize = Math.min(maxGridWidth, maxGridHeight);
+    return Math.floor(maxSize / 9);
+  };
+  
+  const [cellSize, setCellSize] = useState(calculateCellSize);
+  const GRID_SIZE = cellSize * 9;
   const CANVAS_SIZE = GRID_SIZE + 4;
+  
+  // Handle resize
+  useEffect(() => {
+    const handleResize = () => {
+      setCellSize(calculateCellSize());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -36,14 +57,14 @@ export const GridCanvas: React.FC = () => {
     // Draw cell backgrounds
     for (let cell = 0; cell < 81; cell++) {
       const [row, col] = cellCoords(cell);
-      const x = col * CELL_SIZE + 2;
-      const y = row * CELL_SIZE + 2;
+      const x = col * cellSize + 2;
+      const y = row * cellSize + 2;
       
       // Cell background colors
       if (selectedCell === cell) {
         // Selected cell - use CSS variable color
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--pastel-lavender');
-        ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+        ctx.fillRect(x, y, cellSize, cellSize);
       } else if (selectedCell !== null) {
         const [selRow, selCol] = cellCoords(selectedCell);
         if (row === selRow || col === selCol || 
@@ -52,7 +73,7 @@ export const GridCanvas: React.FC = () => {
           // Related cells - very light version
           const primary = getComputedStyle(document.documentElement).getPropertyValue('--pastel-lavender');
           ctx.fillStyle = primary + '33'; // Add transparency
-          ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+          ctx.fillRect(x, y, cellSize, cellSize);
         }
       }
       
@@ -60,7 +81,7 @@ export const GridCanvas: React.FC = () => {
       const cellData = board[cell];
       if (highlightedDigit && cellData.value === highlightedDigit) {
         ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--pastel-sky') || '#D6E5FA';
-        ctx.fillRect(x, y, CELL_SIZE, CELL_SIZE);
+        ctx.fillRect(x, y, cellSize, cellSize);
       }
     }
     
@@ -69,7 +90,7 @@ export const GridCanvas: React.FC = () => {
     ctx.lineWidth = 1;
     for (let i = 0; i <= 9; i++) {
       if (i % 3 !== 0) {
-        const pos = i * CELL_SIZE + 2;
+        const pos = i * cellSize + 2;
         ctx.beginPath();
         ctx.moveTo(pos, 2);
         ctx.lineTo(pos, GRID_SIZE + 2);
@@ -86,7 +107,7 @@ export const GridCanvas: React.FC = () => {
     ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
     ctx.lineWidth = 2;
     for (let i = 0; i <= 3; i++) {
-      const pos = i * CELL_SIZE * 3 + 2;
+      const pos = i * cellSize * 3 + 2;
       ctx.beginPath();
       ctx.moveTo(pos, 2);
       ctx.lineTo(pos, GRID_SIZE + 2);
@@ -101,13 +122,14 @@ export const GridCanvas: React.FC = () => {
     // Draw numbers and candidates
     for (let cell = 0; cell < 81; cell++) {
       const [row, col] = cellCoords(cell);
-      const x = col * CELL_SIZE + 2;
-      const y = row * CELL_SIZE + 2;
+      const x = col * cellSize + 2;
+      const y = row * cellSize + 2;
       const cellData = board[cell];
       
       if (cellData.value !== 0) {
-        // Draw value
-        ctx.font = cellData.given ? 'bold 28px Inter, sans-serif' : '28px Inter, sans-serif';
+        // Draw value - scale font with cell size
+        const fontSize = Math.floor(cellSize * 0.45);
+        ctx.font = cellData.given ? `bold ${fontSize}px Inter, sans-serif` : `${fontSize}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
@@ -120,22 +142,26 @@ export const GridCanvas: React.FC = () => {
           ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary-dark');
         }
         
-        ctx.fillText(cellData.value.toString(), x + CELL_SIZE / 2, y + CELL_SIZE / 2);
+        ctx.fillText(cellData.value.toString(), x + cellSize / 2, y + cellSize / 2);
       } else if (cellData.candidates !== 0) {
-        // Draw candidates with pastel colors
-        ctx.font = '13px Inter, sans-serif';
+        // Draw candidates with pastel colors - scale font
+        const candidateFontSize = Math.floor(cellSize * 0.2);
+        ctx.font = `${candidateFontSize}px Inter, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
         for (let digit = 1; digit <= 9; digit++) {
           if (cellData.candidates & (1 << (digit - 1))) {
-            const dx = ((digit - 1) % 3) * 18 + 12;
-            const dy = Math.floor((digit - 1) / 3) * 18 + 12;
+            const candidateSpacing = cellSize * 0.3;
+            const candidateOffset = cellSize * 0.2;
+            const dx = ((digit - 1) % 3) * candidateSpacing + candidateOffset;
+            const dy = Math.floor((digit - 1) / 3) * candidateSpacing + candidateOffset;
             
             if (highlightedDigit === digit) {
               // Highlight background for this candidate
               ctx.fillStyle = '#FFE5CC'; // Pastel peach
-              ctx.fillRect(x + dx - 7, y + dy - 7, 14, 14);
+              const boxSize = cellSize * 0.22;
+              ctx.fillRect(x + dx - boxSize/2, y + dy - boxSize/2, boxSize, boxSize);
               ctx.fillStyle = '#4A4A5C';
             } else {
               ctx.fillStyle = '#B8B8C8'; // Light gray for candidates
@@ -150,14 +176,14 @@ export const GridCanvas: React.FC = () => {
     // Draw selection border
     if (selectedCell !== null) {
       const [row, col] = cellCoords(selectedCell);
-      const x = col * CELL_SIZE + 2;
-      const y = row * CELL_SIZE + 2;
+      const x = col * cellSize + 2;
+      const y = row * cellSize + 2;
       
       ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
       ctx.lineWidth = 3;
-      ctx.strokeRect(x + 1, y + 1, CELL_SIZE - 2, CELL_SIZE - 2);
+      ctx.strokeRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
     }
-  }, [board, selectedCell, highlightedDigit, conflicts, showConflicts, CELL_SIZE, GRID_SIZE, CANVAS_SIZE]);
+  }, [board, selectedCell, highlightedDigit, conflicts, showConflicts, cellSize, GRID_SIZE, CANVAS_SIZE]);
   
   useEffect(() => {
     draw();
@@ -171,14 +197,14 @@ export const GridCanvas: React.FC = () => {
     const x = e.clientX - rect.left - 2;
     const y = e.clientY - rect.top - 2;
     
-    const col = Math.floor(x / CELL_SIZE);
-    const row = Math.floor(y / CELL_SIZE);
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
     
     if (row >= 0 && row < 9 && col >= 0 && col < 9) {
       const cell = row * 9 + col;
       selectCell(cell);
     }
-  }, [CELL_SIZE, selectCell]);
+  }, [cellSize, selectCell]);
   
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (selectedCell === null) return;
@@ -210,13 +236,34 @@ export const GridCanvas: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
   
+  const handleTouch = useCallback((e: React.TouchEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0] || e.changedTouches[0];
+    const x = touch.clientX - rect.left - 2;
+    const y = touch.clientY - rect.top - 2;
+    
+    const col = Math.floor(x / cellSize);
+    const row = Math.floor(y / cellSize);
+    
+    if (row >= 0 && row < 9 && col >= 0 && col < 9) {
+      const cell = row * 9 + col;
+      selectCell(cell);
+    }
+  }, [cellSize, selectCell]);
+
   return (
-    <canvas
-      ref={canvasRef}
-      width={CANVAS_SIZE}
-      height={CANVAS_SIZE}
-      className={styles.canvas}
-      onClick={handleClick}
-    />
+    <div ref={containerRef} className="canvas-container">
+      <canvas
+        ref={canvasRef}
+        width={CANVAS_SIZE}
+        height={CANVAS_SIZE}
+        className={styles.canvas}
+        onClick={handleClick}
+        onTouchEnd={handleTouch}
+      />
+    </div>
   );
 };
