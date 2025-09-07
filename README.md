@@ -2,6 +2,10 @@
 
 A production-ready, minimalist Sudoku web app with a comprehensive human-logic solving engine.
 
+## Try it out
+
+https://sudoku-flow.vercel.app
+
 ## Features
 
 ### Core Gameplay
